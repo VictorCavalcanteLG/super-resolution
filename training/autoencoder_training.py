@@ -4,6 +4,9 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from models.autoencoder import ConvAutoencoder
 from data_loader.autoencoder_data_loader import AutoencoderDataset
+from infra.monitor.monitor import WandbExperimentMonitor
+from infra.valuable_objects import MonitorExperimentsConfig
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = ConvAutoencoder().to(device)
@@ -23,7 +26,18 @@ train_loader = torch.utils.data.DataLoader(autoencoder_dataset, batch_size=10, s
 
 torch.cuda.empty_cache()
 
-num_epochs = 50
+experiment_monitor = WandbExperimentMonitor(MonitorExperimentsConfig(
+    project_name="super-resolution",
+    project_configs={
+        "learning_rate": 0.001,
+        "architecture": "AutoEncoder",
+        "epochs": 5,
+    }
+))
+
+experiment_monitor.watch_model(model, criterion=criterion)
+
+num_epochs = 5
 for epoch in range(num_epochs):
     print("Epoch: ", epoch)
     train_loss = 0.0
@@ -48,6 +62,7 @@ for epoch in range(num_epochs):
         train_loss += loss.item() * x_img.size(0)
 
     train_loss = train_loss / len(train_loader.dataset)
+    experiment_monitor.log_loss_and_accuracy(train_loss, 0.0)
     print('Epoch: {} \tTraining Loss: {:.6f}'.format(epoch+1, train_loss))
 
 torch.save(model.state_dict(), "/home/victor/pythonProjects/super-resolution/models_zoo/train_4.pth")
