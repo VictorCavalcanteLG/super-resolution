@@ -1,11 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torchvision import datasets, transforms
-from models.autoencoder import ConvAutoencoder
-from data_loader.autoencoder_data_loader import AutoencoderDataset
-from infra.monitor.monitor import WandbExperimentMonitor
-from infra.valuable_objects import MonitorExperimentsConfig
+from torchvision import transforms
+from src.models.autoencoder import ConvAutoencoder
+from src.datasets.autoencoder_dataset import AutoencoderDataset
+from src.infra.monitor.monitor import WandbExperimentMonitor
+from src.infra.valuable_objects import MonitorExperimentsConfig
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -65,4 +65,4 @@ for epoch in range(num_epochs):
     experiment_monitor.log_loss_and_accuracy(train_loss, 0.0)
     print('Epoch: {} \tTraining Loss: {:.6f}'.format(epoch+1, train_loss))
 
-torch.save(model.state_dict(), "/home/victor/pythonProjects/super-resolution/models_zoo/train_4.pth")
+torch.save(model.state_dict(), "/models_zoo/train_4.pth")

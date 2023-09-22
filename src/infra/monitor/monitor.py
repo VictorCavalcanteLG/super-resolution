@@ -1,6 +1,6 @@
 import wandb
-from infra.contracts import ExperimentMonitor
-from infra.valuable_objects import MonitorExperimentsConfig
+from src.infra.contracts import ExperimentMonitor
+from src.infra.valuable_objects import MonitorExperimentsConfig
 
 
 class WandbExperimentMonitor(ExperimentMonitor):
