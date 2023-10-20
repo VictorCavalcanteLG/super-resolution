@@ -11,10 +11,10 @@ class WandbExperimentMonitor(ExperimentMonitor):
             config=configs.project_configs
         )
 
-    def log_loss_and_accuracy(self, loss: float, acc: float):
+    def log_loss(self, train_loss: float, validate_loss: float):
         self.run.log({
-            "loss": loss,
-            "acc": acc
+            "train_loss": train_loss,
+            "validate_loss": validate_loss
         })
 
     def watch_model(self, model, criterion, log="all", log_freq=10):
