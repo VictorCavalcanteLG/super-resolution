@@ -7,12 +7,15 @@ from pathlib import Path
 
 class AutoencoderDataset(Dataset):
     def __init__(self, input_image_folder_dataset, output_image_folder_dataset, transforms=None):
-        self.input_image_folder_dataset = glob.glob(input_image_folder_dataset + "/*.png")[:100]
+        self.input_image_folder_dataset = glob.glob(input_image_folder_dataset + "/*.png")
+        random.shuffle(self.input_image_folder_dataset)
         self.output_image_folder_dataset = Path(output_image_folder_dataset)
         self.transforms = transforms
+        self.current_index = 0
 
     def __getitem__(self, index):
-        x_img_path = random.choice(self.input_image_folder_dataset)
+        x_img_path = self.input_image_folder_dataset[self.current_index]
+        self.current_index = (self.current_index + 1) % len(self.input_image_folder_dataset)
         x_img = Image.open(x_img_path)
         x_img = x_img.convert("RGB")
         actual_path = Path(x_img_path)
