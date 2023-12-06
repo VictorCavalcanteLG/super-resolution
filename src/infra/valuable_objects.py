@@ -6,3 +6,5 @@ from typing import Dict, Union
 class MonitorExperimentsConfig:
     project_name: str
     project_configs: Dict[str, Union[str, float, int]]
+    job_name: str
+    entity: str
