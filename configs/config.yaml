@@ -1,0 +1,19 @@
+x_train_dataset_path: ./databases/DIV2K/DIV2K_train_LR_240p
+y_train_dataset_path: ./databases/DIV2K/DIV2K_train_LR_480p
+x_test_dataset_path: ./databases/DIV2K/DIV2K_valid_LR_240p
+y_test_dataset_path: ./databases/DIV2K/DIV2K_valid_LR_480p
+
+model_configs:
+  model: autoencoder
+  criterion: bce_loss
+  learning_rate: 0.00001
+  batch_size: 5
+  validation_split: 0.2
+  num_epochs: 100
+
+learning_rate_scheduler:
+  function: reduce_on_plateau
+  configs:
+    mode: min
+    factor: 0.1
+    patience: 5
