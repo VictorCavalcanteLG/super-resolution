@@ -8,24 +8,29 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
         git \
-        python3-pip \
-        python3-dev \
-        python3-opencv \
-        libglib2.0-0 \
+        curl \
+        libglib2.0-0
 
-# Install any python packages you need
-COPY requirements.txt requirements.txt
+# Install Miniconda
+RUN curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda && \
+    rm Miniconda3-latest-Linux-x86_64.sh
 
-RUN python3 -m pip install -r requirements.txt
+# Add conda to the PATH
+ENV PATH="/opt/conda/bin:${PATH}"
 
-# Upgrade pip
-RUN python3 -m pip install --upgrade pip
+# Create a new conda environment with Python 3.11 and install dependencies
+COPY environment.yaml .
+RUN /opt/conda/bin/conda env create -f environment.yaml && \
+    /opt/conda/bin/conda clean --all --yes
+
+# Ative o ambiente conda
+SHELL ["/bin/bash", "--login", "-c"]
+RUN source activate super-resolution
 
 # Install PyTorch and torchvision
 RUN pip3 install torch torchvision torchaudio -f https://download.pytorch.org/whl/cu111/torch_stable.html
 
-# Set the working directory
-WORKDIR /app
+WORKDIR super-resolution/
 
-# Set the entrypoint
-ENTRYPOINT [ "python3", "main.py" ]
+CMD ["conda", "run", "--no-capture-output", "-n", "super-resolution", "python", "-m", "src.scripts.train_model"]
