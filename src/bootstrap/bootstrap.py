@@ -5,6 +5,8 @@ from src.bootstrap.valuable_objects import LOSS, MODEL, LEARNING_RATE_SCHEDULER
 class Bootstrap:
 
     def __init__(self, config_path):
+        self.output_dataset_path = None
+        self.model_zoo = None
         self.lr_scheduler_configs = None
         self.lr_scheduler_function = None
         self.validation_split = None
@@ -42,3 +44,8 @@ class Bootstrap:
 
         self.lr_scheduler_function = LEARNING_RATE_SCHEDULER[lr_scheduler['function']]
         self.lr_scheduler_configs = lr_scheduler['configs']
+        
+        evaluation = self.__data['evaluation']
+        
+        self.model_zoo = evaluation['model_zoo']
+        self.output_dataset_path = evaluation['output_dataset_path']
