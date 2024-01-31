@@ -7,7 +7,7 @@ from pathlib import Path
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = ConvAutoencoder().to(device)
-model_weights_path = "/models_zoo/train_4.pth"
+model_weights_path = "/models_zoo/train_5.pth"
 model.load_state_dict(torch.load(model_weights_path))
 model.eval()
 

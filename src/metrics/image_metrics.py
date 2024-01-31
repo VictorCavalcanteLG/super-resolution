@@ -20,7 +20,7 @@ def signal_to_noise_ratio(original_image, noisy_image):
     return snr
 
 
-def structural_similarity_index(original_image, noisy_image):
+def structural_similarity_index(original_image, noisy_image, win_size):
     """
     Calculates the Structural Similarity Index (SSIM) between two images.
 
@@ -31,7 +31,7 @@ def structural_similarity_index(original_image, noisy_image):
     Returns:
         The SSIM value.
     """
-    return ssim(original_image, noisy_image, multichannel=True)
+    return ssim(original_image, noisy_image, win_size=win_size, channel_axis=3, multichannel=True)
 
 
 def mean_absolute_error(original_image, noisy_image):
