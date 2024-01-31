@@ -8,7 +8,7 @@ from src.infra.contracts import ExperimentMonitor
 class ModelTrainer:
 
     def __init__(self, model_class: nn.Module, dataset: Dataset, experiment_monitor: ExperimentMonitor, criterion_class,
-                 validation_split=0.2, batch_size=1, learning_rate=0.001):
+                 lr_scheduler_function, lr_scheduler_configs, validation_split=0.2, batch_size=1, learning_rate=0.001):
         """
         Initializes the class.
 
@@ -17,8 +17,10 @@ class ModelTrainer:
             dataset: Instance of Dataset.
             experiment_monitor: Instance of ExperimentMonitor.
             criterion_class: Criterion class (loss function).
-            batch_size: Batch size to train the model.
+            lr_scheduler_function: Learning rate scheduler.
+            lr_scheduler_configs: Configs of learning rate scheduler.
             validation_split: Database division percentage for validation.
+            batch_size: Batch size to train the model.
             learning_rate: Learning rate (default is 0.001).
         """
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -31,6 +33,7 @@ class ModelTrainer:
         self.model = model_class().to(self.device)
         self.criterion = criterion_class()
         self.optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+        self.scheduler = lr_scheduler_function(self.optimizer, **lr_scheduler_configs)
 
         dataset_size = len(dataset)
         validation_size = int(validation_split * dataset_size)
@@ -67,13 +70,14 @@ class ModelTrainer:
     def train(self, num_epochs):
         self.experiment_monitor.watch_model(self.model, criterion=self.criterion)
 
+        old_loss = 100.0
+
         for epoch in range(num_epochs):
             self.model.train()
 
             print("Epoch: ", epoch)
             train_loss = 0.0
             for data in self.train_loader:
-                print("teste")
                 self.optimizer.zero_grad()
 
                 x_img, y_img = data
@@ -97,6 +101,11 @@ class ModelTrainer:
 
             val_loss = self.validate()
             print('Epoch: {} \tValidation Loss: {:.6f}'.format(epoch + 1, val_loss))
+            self.scheduler.step(val_loss)
+
+            if val_loss < old_loss:
+                old_loss = val_loss
+                torch.save(self.model.state_dict(), "/super-resolution/models_zoo/train_6_2////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////.pth")
 
             self.experiment_monitor.log_loss(train_loss, val_loss)
 
